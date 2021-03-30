@@ -1,0 +1,71 @@
+# Build stage
+FROM ubuntu:latest
+
+#
+# System tools used by OneAPI. Adapted from OneAPI os-tools-ubuntu
+#
+RUN apt-get update && \
+    apt-get install --yes wget \
+    libc6-dev libc6 libc-bin \
+    # build-essential \
+    make cmake \
+    ca-certificates \
+    gnupg
+
+# configure the repository
+RUN wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB && \
+    apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB && \
+    echo "deb https://apt.repos.intel.com/oneapi all main" >> /etc/apt/sources.list # /etc/apt/sources.list.d/oneAPI.list
+
+RUN apt-get update && \
+    apt-get install --yes intel-hpckit-getting-started intel-oneapi-clck && \
+    apt-get install --yes intel-oneapi-common-licensing intel-oneapi-common-vars && \
+    apt-get install --yes intel-oneapi-dev-utilities  intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic && \
+    apt-get install --yes intel-oneapi-compiler-fortran intel-oneapi-inspector intel-oneapi-itac
+
+ENV FC=ifort CC=icx
+
+#
+# Netcdf starting here
+#
+ENV NCHOME=/home/runner/netcdf-c
+ENV NFHOME=/home/runner/netcdf-fortran
+
+# Install dependencies
+RUN apt-get update && \
+    apt-get -y install git m4 && \
+    apt-get -y install libhdf5-dev libcurl4-gnutls-dev hdf5-helpers
+
+SHELL [ "/usr/bin/bash", "-c"]
+
+# build netCDF C libraries
+# Would be best to put the environment variables in the RUN but haven't figured
+#   out how to do that with multiple variables
+ENV CPPFLAGS=-I/usr/include/hdf5/serial \
+    LDFLAGS=-L/usr/lib/x86_64-linux-gnu/hdf5/serial/
+RUN source /opt/intel/oneapi/setvars.sh && \
+    mkdir -p /source && \
+    cd /source && \
+    git clone https://github.com/Unidata/netcdf-c.git --branch v4.7.4 && \
+    cd netcdf-c && \
+    ./configure --prefix=${NCHOME} && \
+    make -j && \
+    make install && \
+    make clean
+ENV CPPFLAGS="" LDFLAGS=""
+ENV LD_LIBRARY_PATH=${NCHOME}/lib
+
+# netCDF Fortran libraries
+ENV CPPFLAGS=-I${NCHOME}/include \
+    LDFLAGS=-L${NCHOME}/lib \
+    FCFLAGS=-fPIC
+RUN source /opt/intel/oneapi/setvars.sh && \
+    cd /source && \
+    git clone https://github.com/Unidata/netcdf-fortran.git --branch v4.5.3 && \
+    cd netcdf-fortran && \
+    ./configure --prefix=${NFHOME} && \
+    make -j && \
+    make install && \
+    make clean
+ENV CPPFLAGS="" LDFLAGS=""
+ENV LD_LIBRARY_PATH=${NFHOME}/lib:${LD_LIBRARY_PATH}
