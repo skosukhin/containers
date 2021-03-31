@@ -1,0 +1,23 @@
+# Build stage
+FROM ubuntu:latest
+
+#
+# System tools used by OneAPI. Adapted from OneAPI os-tools-ubuntu
+#
+RUN apt-get update && \
+    apt-get install --yes wget \
+    libc6-dev libc6 libc-bin \
+    # build-essential \
+    make cmake \
+    ca-certificates \
+    gnupg
+#
+# From our original CI
+#
+ENV NVCOMPILERS=/opt/nvidia/hpc_sdk
+RUN wget -q https://developer.download.nvidia.com/hpc-sdk/20.11/nvhpc-20-11_20.11_amd64.deb \
+            https://developer.download.nvidia.com/hpc-sdk/20.11/nvhpc-2020_20.11_amd64.deb && \
+    apt-get install -y ./nvhpc-20-11_20.11_amd64.deb ./nvhpc-2020_20.11_amd64.deb && \
+    rm ./nvhpc-20-11_20.11_amd64.deb ./nvhpc-2020_20.11_amd64.deb
+
+ENV FC=nvfortran CC=nvc PATH=${NVCOMPILERS}/Linux_x86_64/20.11/compilers/bin:${PATH}
