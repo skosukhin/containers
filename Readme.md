@@ -10,7 +10,11 @@ At present these mostly define minimal Docker containers providing stable enviro
 
 ```
 docker build . -t earthsystemradiation/rte-rrtmgp:ifort -f Dockerfile-ifort-minimal
-docker build . -t add-netcdf -f Dockerfile-add-netcdf --build-arg COMPILER=ifort
+docker build . -t earthsystemradiation/rte-rrtmgp:nvidia -f Dockerfile-nvidia-minimal
+docker build . -t add-netcdf -f Dockerfile-add-netcdf --build-arg BASE=ifort
+docker build . -t add-netcdf -f Dockerfile-add-netcdf --build-arg BASE=nvidia
 docker tag add-netcdf add-netcdf:ifort
+docker tag add-netcdf add-netcdf:nvidia
 docker build . -t add-python -f Dockerfile-add-python --build-arg BASE=add-netcdf:ifort
+docker build . -t add-python -f Dockerfile-add-python --build-arg BASE=add-netcdf:nvidia
 ```

@@ -7,7 +7,6 @@ FROM ubuntu:latest
 RUN apt-get update && \
     apt-get install --yes wget \
     libc6-dev libc6 libc-bin \
-    # build-essential \
     make cmake \
     ca-certificates \
     gnupg
