@@ -19,7 +19,7 @@ SHELL [ "/usr/bin/bash", "-c"]
 #   out how to do that with multiple variables
 ENV CPPFLAGS=-I/usr/include/hdf5/serial \
     LDFLAGS=-L/usr/lib/x86_64-linux-gnu/hdf5/serial/
-RUN source /opt/intel/oneapi/setvars.sh && \
+RUN source /opt/intel/oneapi/setvars.sh || true && \
     mkdir -p /source && \
     cd /source && \
     git clone https://github.com/Unidata/netcdf-c.git --branch v4.7.4 && \
@@ -36,7 +36,7 @@ ENV LD_LIBRARY_PATH=${NCHOME}/lib
 ENV CPPFLAGS=-I${NCHOME}/include \
     LDFLAGS=-L${NCHOME}/lib \
     FCFLAGS=-fPIC
-RUN source /opt/intel/oneapi/setvars.sh && \
+RUN source /opt/intel/oneapi/setvars.sh || true && \
     cd /source && \
     git clone https://github.com/Unidata/netcdf-fortran.git --branch v4.5.3 && \
     cd netcdf-fortran && \
