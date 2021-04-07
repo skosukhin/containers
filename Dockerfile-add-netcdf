@@ -1,5 +1,5 @@
-ARG BASE
-FROM $BASE
+ARG COMPILER
+FROM minimal-compiler:$COMPILER
 #
 # Install netCDF C and Fortran libraries and their dependencies
 #

@@ -1,5 +1,5 @@
-ARG BASE
-FROM $BASE
+ARG COMPILER
+FROM add-netcdf:$COMPILER
 #
 # Install Python3 and a small set of packages
 #
