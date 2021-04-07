@@ -1,38 +1,17 @@
-# Build stage
-FROM ubuntu:latest
-
+ARG COMPILER
+FROM minimal-compiler:$COMPILER
 #
-# System tools used by OneAPI. Adapted from OneAPI os-tools-ubuntu
+# Install netCDF C and Fortran libraries and their dependencies
 #
-RUN apt-get update && \
-    apt-get install --yes wget \
-    libc6-dev libc6 libc-bin \
-    # build-essential \
-    make cmake \
-    ca-certificates \
-    gnupg
-#
-# From our original CI
-#
-ENV NVCOMPILERS=/opt/nvidia/hpc_sdk
-RUN wget -q https://developer.download.nvidia.com/hpc-sdk/20.11/nvhpc-20-11_20.11_amd64.deb \
-            https://developer.download.nvidia.com/hpc-sdk/20.11/nvhpc-2020_20.11_amd64.deb && \
-    apt-get install -y ./nvhpc-20-11_20.11_amd64.deb ./nvhpc-2020_20.11_amd64.deb && \
-    rm ./nvhpc-20-11_20.11_amd64.deb ./nvhpc-2020_20.11_amd64.deb
-
-ENV FC=nvfortran CC=nvc PATH=${NVCOMPILERS}/Linux_x86_64/20.11/compilers/bin:${PATH}
-
-#
-# Netcdf starting here
-#
-ENV NCHOME=/home/runner/netcdf-c
-ENV NFHOME=/home/runner/netcdf-fortran
+ENV NCHOME=/home/runner/netcdf-c NFHOME=/home/runner/netcdf-fortran
 
 # Install dependencies
 RUN apt-get update && \
     apt-get -y install git m4 && \
     apt-get -y install libhdf5-dev libcurl4-gnutls-dev hdf5-helpers
 
+# Need to use bash because the Intel compilers require setting
+#   environment variables by sourcing a script
 SHELL [ "/usr/bin/bash", "-c"]
 
 # build netCDF C libraries
@@ -40,7 +19,7 @@ SHELL [ "/usr/bin/bash", "-c"]
 #   out how to do that with multiple variables
 ENV CPPFLAGS=-I/usr/include/hdf5/serial \
     LDFLAGS=-L/usr/lib/x86_64-linux-gnu/hdf5/serial/
-RUN source /opt/intel/oneapi/setvars.sh && \
+RUN source /opt/intel/oneapi/setvars.sh || true && \
     mkdir -p /source && \
     cd /source && \
     git clone https://github.com/Unidata/netcdf-c.git --branch v4.7.4 && \
@@ -51,12 +30,13 @@ RUN source /opt/intel/oneapi/setvars.sh && \
     make clean
 ENV CPPFLAGS="" LDFLAGS=""
 ENV LD_LIBRARY_PATH=${NCHOME}/lib
-
+#
 # netCDF Fortran libraries
+#
 ENV CPPFLAGS=-I${NCHOME}/include \
     LDFLAGS=-L${NCHOME}/lib \
     FCFLAGS=-fPIC
-RUN source /opt/intel/oneapi/setvars.sh && \
+RUN source /opt/intel/oneapi/setvars.sh || true && \
     cd /source && \
     git clone https://github.com/Unidata/netcdf-fortran.git --branch v4.5.3 && \
     cd netcdf-fortran && \

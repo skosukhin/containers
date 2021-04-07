@@ -1,0 +1,8 @@
+#
+# Most current mix of compiler and single CUDA version available from
+#   https://ngc.nvidia.com/catalog/containers/nvidia:nvhpc/tags
+#
+FROM nvcr.io/nvidia/nvhpc:21.1-devel-cuda11.2-ubuntu20.04
+
+ENV FC=nvfortran CC=nvc NVCOMPILERS=/opt/nvidia/hpc_sdk
+ENV PATH=${NVCOMPILERS}/Linux_x86_64/20.11/compilers/bin:${PATH}

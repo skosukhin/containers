@@ -1,0 +1,25 @@
+# Build stage
+FROM ubuntu:latest
+
+#
+# System tools used by OneAPI. Adapted from OneAPI os-tools-ubuntu
+#
+RUN apt-get update && \
+    apt-get install --yes wget \
+    libc6-dev libc6 libc-bin \
+    make cmake \
+    ca-certificates \
+    gnupg
+
+# configure the repository
+RUN wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB && \
+    apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB && \
+    echo "deb https://apt.repos.intel.com/oneapi all main" >> /etc/apt/sources.list # /etc/apt/sources.list.d/oneAPI.list
+
+RUN apt-get update && \
+    apt-get install --yes intel-hpckit-getting-started intel-oneapi-clck && \
+    apt-get install --yes intel-oneapi-common-licensing intel-oneapi-common-vars && \
+    apt-get install --yes intel-oneapi-dev-utilities  intel-oneapi-compiler-dpcpp-cpp-and-cpp-classic && \
+    apt-get install --yes intel-oneapi-compiler-fortran intel-oneapi-inspector intel-oneapi-itac
+
+ENV FC=ifort CC=icx
