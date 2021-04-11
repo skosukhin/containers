@@ -1,0 +1,58 @@
+version: '3.8'
+
+# service stack for RTE-RRTMGP Continuous Integration
+# images depend on each other, but docker-compose only has a "depends_on"
+# option for running the services (i.e., running the container)
+# https://stackoverflow.com/a/37945466
+# so one either has to build the images at the beginning of the
+# chain or build them first
+services:
+  min-ifort:
+    build:
+      context: ./
+      dockerfile: Dockerfile-ifort-minimal
+    image: minimal-compiler:ifort
+    container_name: min-ifort
+
+  min-nvfortran:
+    build:
+      context: ./
+      dockerfile: Dockerfile-nvfortran-minimal
+    image: minimal-compiler:nvfortran
+    container_name: min-nvfortran
+
+  nc-ifort:
+    build:
+      context: ./
+      dockerfile: Dockerfile-add-netcdf
+      args:
+        - COMPILER=ifort
+    image: add-netcdf:ifort
+    container_name: nc-ifort
+
+  nc-nvfortran:
+    build:
+      context: ./
+      dockerfile: Dockerfile-add-netcdf
+      args:
+        - COMPILER=nvfortran
+    image: minimal-compiler:nvfortran
+    container_name: nc-nvfortran
+
+  ci-ifort:
+    build:
+      context: ./
+      dockerfile: Dockerfile-add-python
+      args:
+        - COMPILER=ifort
+    image: earthsystemradiation/rte-rrtmgp-ci:ifort
+    container_name: ci-ifort
+
+  ci-nvfortran:
+    build:
+      context: ./
+      dockerfile: Dockerfile-add-python
+      args:
+        - COMPILER=nvfortran
+    image: earthsystemradiation/rte-rrtmgp-ci:nvfortran
+    container_name: ci-nvfortran

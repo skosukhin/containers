@@ -8,7 +8,7 @@ At present these mostly define minimal Docker containers providing stable enviro
 docker build - < Dockerfile-nvidia-netcdf-minimal
 ```
 
-## Pernak Refinements
+## Docker <a name="docker"></a>
 
 We start with images that are effectively Ubuntu OS base images, then add FORTRAN compiler dependencies for Intel and Nvidia -- `ifort` and `nvfortran`, respectively. These are separate images, and we use them as bases for the netCDF library installation. Finally, we add the Python libraries necessary for RTE-RRTMGP continuous integration, then push the images to a publicly available repository on DockerHub. We use tags to indicate which compiler is used in the resulting images.
 
@@ -48,3 +48,24 @@ docker build . -t earthsystemradiation/rte-rrtmgp-ci:ifort -f Dockerfile-add-pyt
 ```
 
 Since `rte-rrtmgp-ci` is dependent on the starter and netCDF images, there is likely no reason to push either to DockerHub. The local names of these two images are used in `Dockerfile-add-netcdf` and `Dockerfile-add-python`.
+
+## Docker Compose <a name="compose"></a>
+
+Alternatively, users can use `docker-compose` to build the images and run the containers. Docker Compose reads bulid and run parameters a YAML file. For RTE-RRTMGP Continuous Integration, `rte-rrtmgp-ci.yml` is the configuration file with the "service stack." Images can be built with:
+
+```
+docker-compose -f rte-rrtmgp-ci.yml build
+```
+
+The previous command will build all images. For specific images, users can provide their service name after the `build` option. Currently, the services correspond to [the builds that were done separately](#docker) with each `docker build` command and are named:
+
+1. `min-ifort`
+2. `min-nvfortran`
+3. `nc-ifort`
+4. `nc-nvfortran`
+5. `ci-ifort`
+6. `ci-nvfortran`
+
+Note that images 3-6 depend on previous services, but Docker Compose only has a `depends_on` option for [running the services](https://stackoverflow.com/a/37945466) (i.e., running the container) so one either has to build the images at the beginning of the chain or build them first.
+
+Again, `docker-compose` can be used to run services as well, but the service stack will need more additions before anything of substance can be performed.
