@@ -66,6 +66,6 @@ The previous command will build all images. For specific images, users can provi
 5. `ci-ifort`
 6. `ci-nvfortran`
 
-Note that images 3-6 depend on previous services, but Docker Compose only has a `depends_on` option for [running the services](https://stackoverflow.com/a/37945466) (i.e., running the container) so one either has to build the images at the beginning of the chain or build them first.
+Note that images 3-6 depend on previous services, but Docker Compose only has a `depends_on` option for [running the services](https://stackoverflow.com/a/37945466) (i.e., running the container) so one either has to build the images at the beginning of the chain or already have them in their local image repository.
 
 Again, `docker-compose` can be used to run services as well, but the service stack will need more additions before anything of substance can be performed.
