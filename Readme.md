@@ -51,7 +51,7 @@ Since `rte-rrtmgp-ci` is dependent on the starter and netCDF images, there is li
 
 ## Docker Compose <a name="compose"></a>
 
-Alternatively, users can use `docker-compose` to build the images and run the containers. Docker Compose reads bulid and run parameters a YAML file. For RTE-RRTMGP Continuous Integration, `rte-rrtmgp-ci.yml` is the configuration file with the "service stack." Images can be built with:
+Alternatively, users can use `docker-compose` to build the images and run the containers. Docker Compose reads build and run parameters from a YAML file. For RTE-RRTMGP Continuous Integration, `rte-rrtmgp-ci.yml` is the configuration file with the "service stack." Images can be built with:
 
 ```
 docker-compose -f rte-rrtmgp-ci.yml build
