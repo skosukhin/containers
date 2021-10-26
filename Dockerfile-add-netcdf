@@ -6,6 +6,7 @@ FROM minimal-compiler:$COMPILER
 ENV NCHOME=/home/runner/netcdf-c NFHOME=/home/runner/netcdf-fortran
 
 # Install dependencies
+RUN apt clean
 RUN apt-get update && \
     apt-get -y install git m4 && \
     apt-get -y install libhdf5-dev libcurl4-gnutls-dev hdf5-helpers
@@ -22,6 +23,7 @@ ENV CPPFLAGS=-I/usr/include/hdf5/serial \
 RUN source /opt/intel/oneapi/setvars.sh || true && \
     mkdir -p /source && \
     cd /source && \
+    rm -rf netcdf-c && \
     git clone https://github.com/Unidata/netcdf-c.git --branch v4.7.4 && \
     cd netcdf-c && \
     ./configure --prefix=${NCHOME} && \
@@ -38,6 +40,7 @@ ENV CPPFLAGS=-I${NCHOME}/include \
     FCFLAGS=-fPIC
 RUN source /opt/intel/oneapi/setvars.sh || true && \
     cd /source && \
+    rm -rf netcdf-fortran && \
     git clone https://github.com/Unidata/netcdf-fortran.git --branch v4.5.3 && \
     cd netcdf-fortran && \
     ./configure --prefix=${NFHOME} && \
