@@ -10,6 +10,9 @@ env:
 
 jobs:
   docker:
+    strategy:
+      matrix:
+        compiler:  [ifort, nvfortran]
     runs-on: ubuntu-latest
     steps:
       - name: Check out RRTMGP containers repository code
@@ -30,25 +33,15 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: ifort images build and push
+      - name:  images build and push
         run: |
-          docker build . -t minimal-compiler:ifort -f Dockerfile-ifort-minimal
-          docker build . -t add-netcdf:ifort -f Dockerfile-add-netcdf --build-arg COMPILER=ifort
-          docker build . -t rte-rrtmgp-ci:ifort -f Dockerfile-add-python --build-arg COMPILER=ifort
-          docker tag rte-rrtmgp-ci:ifort earthsystemradiation/rte-rrtmgp-ci:ifort
-          docker push earthsystemradiation/rte-rrtmgp-ci:ifort
-#          docker push ghcr.io/earth-system-radiation/rte-rrtmgp-ci:ifort
+          docker build . -t minimal-compiler:${{ matrix.compiler }} -f Dockerfile-${{ matrix.compiler }}-minimal
+          docker build . -t add-netcdf:${{ matrix.compiler }}       -f Dockerfile-add-netcdf --build-arg COMPILER=${{ matrix.compiler }}
+          docker build . -t rte-rrtmgp-ci:${{ matrix.compiler }}    -f Dockerfile-add-python --build-arg COMPILER=${{ matrix.compiler }}
+          docker tag rte-rrtmgp-ci:${{ matrix.compiler }} earthsystemradiation/rte-rrtmgp-ci:${{ matrix.compiler }}
+          docker push earthsystemradiation/rte-rrtmgp-ci:${{ matrix.compiler }}
+#          docker push ghcr.io/earth-system-radiation/rte-rrtmgp-ci:${{ matrix.compiler }}
 
-      - name: nvidia images build and push
-        run: |
-          docker build . -t minimal-compiler:nvfortran -f Dockerfile-nvfortran-minimal
-          docker pull nvcr.io/nvidia/nvhpc:21.1-devel-cuda11.2-ubuntu20.04 # worked fine
-          docker build . -t minimal-compiler:nvfortran -f Dockerfile-nvfortran-minimal
-          docker build . -t add-netcdf:nvfortran -f Dockerfile-add-netcdf --build-arg COMPILER=nvfortran
-          docker build . -t rte-rrtmgp-ci:nvfortran -f Dockerfile-add-python --build-arg COMPILER=nvfortran
-          docker tag rte-rrtmgp-ci:nvfortran earthsystemradiation/rte-rrtmgp-ci:nvfortran
-          docker push earthsystemradiation/rte-rrtmgp-ci:nvfortran
-#          docker push ghcr.io/earth-system-radiation/rte-rrtmgp-ci:nvfortran
 
       # because we don't use the default `Dockerfile` and instead
       # pass `-f Dockerfile-*`, the build step with `build-push-action`
