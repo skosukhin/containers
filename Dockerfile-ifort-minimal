@@ -23,5 +23,6 @@ RUN apt-get update && \
     apt-get install --yes intel-oneapi-compiler-fortran intel-oneapi-inspector intel-oneapi-itac
 
 RUN apt-get install curl
+RUN apt-get install zstd || true
 
 ENV FC=ifort CC=icx
