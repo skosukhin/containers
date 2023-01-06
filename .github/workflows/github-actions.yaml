@@ -37,7 +37,8 @@ jobs:
         run: |
           docker build . -t minimal-compiler:${{ matrix.compiler }} -f Dockerfile-${{ matrix.compiler }}-minimal
           docker build . -t add-netcdf:${{ matrix.compiler }}       -f Dockerfile-add-netcdf --build-arg COMPILER=${{ matrix.compiler }}
-          docker build . -t rte-rrtmgp-ci:${{ matrix.compiler }}    -f Dockerfile-add-python --build-arg COMPILER=${{ matrix.compiler }}
+          docker build . -t add-python:${{ matrix.compiler }}       -f Dockerfile-add-python --build-arg COMPILER=${{ matrix.compiler }}
+          docker build . -t rte-rrtmgp-ci:${{ matrix.compiler }}    -f Dockerfile-finalize   --build-arg COMPILER=${{ matrix.compiler }}
           docker tag rte-rrtmgp-ci:${{ matrix.compiler }} earthsystemradiation/rte-rrtmgp-ci:${{ matrix.compiler }}
           docker push earthsystemradiation/rte-rrtmgp-ci:${{ matrix.compiler }}
 #          docker push ghcr.io/earth-system-radiation/rte-rrtmgp-ci:${{ matrix.compiler }}

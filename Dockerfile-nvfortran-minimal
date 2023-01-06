@@ -4,7 +4,12 @@
 #
 FROM nvcr.io/nvidia/nvhpc:22.9-devel-cuda11.7-ubuntu22.04
 
-RUN apt-get install zstd || true
+# Initialize Nvidia compiler for login shells
+RUN echo 'module load nvhpc-nompi' >> /etc/profile.d/nvhpc.sh
 
-ENV FC=nvfortran CC=nvc NVCOMPILERS=/opt/nvidia/hpc_sdk
-ENV PATH=${NVCOMPILERS}/Linux_x86_64/22.9/compilers/bin:${PATH}
+# Enable Nvidia compiler for the Dockerfile instructions
+SHELL ["/bin/bash", "-lc"]
+
+# Enable Nvidia compiler for the CLI commands and interactive mode
+ENTRYPOINT ["/bin/bash", "-lc", "\"$@\"", "--"]
+CMD ["/bin/bash"]
