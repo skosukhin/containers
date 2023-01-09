@@ -36,13 +36,31 @@ services:
       dockerfile: Dockerfile-add-netcdf
       args:
         - COMPILER=nvfortran
-    image: minimal-compiler:nvfortran
+    image: add-netcdf:nvfortran
     container_name: nc-nvfortran
+
+  py-ifort:
+    build:
+      context: ./
+      dockerfile: Dockerfile-add-python
+      args:
+        - COMPILER=ifort
+    image: add-python:ifort
+    container_name: py-ifort
+
+  py-nvfortran:
+    build:
+      context: ./
+      dockerfile: Dockerfile-add-python
+      args:
+        - COMPILER=nvfortran
+    image: add-python:nvfortran
+    container_name: py-nvfortran
 
   ci-ifort:
     build:
       context: ./
-      dockerfile: Dockerfile-add-python
+      dockerfile: Dockerfile-finalize
       args:
         - COMPILER=ifort
     image: earthsystemradiation/rte-rrtmgp-ci:ifort
@@ -51,7 +69,7 @@ services:
   ci-nvfortran:
     build:
       context: ./
-      dockerfile: Dockerfile-add-python
+      dockerfile: Dockerfile-finalize
       args:
         - COMPILER=nvfortran
     image: earthsystemradiation/rte-rrtmgp-ci:nvfortran

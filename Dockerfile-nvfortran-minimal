@@ -4,7 +4,5 @@
 #
 FROM nvcr.io/nvidia/nvhpc:22.9-devel-cuda11.7-ubuntu22.04
 
-RUN apt-get install zstd || true
-
-ENV FC=nvfortran CC=nvc NVCOMPILERS=/opt/nvidia/hpc_sdk
-ENV PATH=${NVCOMPILERS}/Linux_x86_64/22.9/compilers/bin:${PATH}
+# Set default compiler executables
+ENV FC=nvfortran CC=nvc

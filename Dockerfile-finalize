@@ -1,0 +1,12 @@
+#
+# Finalize CI containers
+#
+
+ARG COMPILER
+FROM add-python:$COMPILER
+
+# Install additional tools
+RUN apt-get update \
+ && apt-get --yes install \
+      --no-install-recommends \
+      zstd
