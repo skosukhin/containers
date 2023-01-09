@@ -4,12 +4,5 @@
 #
 FROM nvcr.io/nvidia/nvhpc:22.9-devel-cuda11.7-ubuntu22.04
 
-# Initialize Nvidia compiler for login shells
-RUN echo 'module load nvhpc-nompi' >> /etc/profile.d/nvhpc.sh
-
-# Enable Nvidia compiler for the Dockerfile instructions
-SHELL ["/bin/bash", "-lc"]
-
-# Enable Nvidia compiler for the CLI commands and interactive mode
-ENTRYPOINT ["/bin/bash", "-lc", "\"$@\"", "--"]
-CMD ["/bin/bash"]
+# Set default compiler executables
+ENV FC=nvfortran CC=nvc
