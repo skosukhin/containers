@@ -1,12 +1,7 @@
-# simplified from https://docs.github.com/en/actions/publishing-packages/publishing-docker-images#publishing-images-to-docker-hub-and-github-packages
 name: RRTMGP Base Images Build
 run-name: CI Image Build
 
 on: [push]
-
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   docker:
@@ -15,50 +10,49 @@ jobs:
         compiler:  [ifort, nvfortran]
     runs-on: ubuntu-latest
     steps:
-      - name: Check out RRTMGP containers repository code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      # this login works, but we have not yet implemented corresponding
-      # image pushes
-      - name: Log in to the GitHub Container registry
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+      - name: Build minimal-compiler:${{ matrix.compiler }}
+        uses: docker/build-push-action@v3
         with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          file: Dockerfile-${{ matrix.compiler }}-minimal
+          tags: minimal-compiler:${{ matrix.compiler }}
+
+      - name: Build add-netcdf:${{ matrix.compiler }}
+        uses: docker/build-push-action@v3
+        with:
+          file: Dockerfile-add-netcdf
+          build-args: COMPILER=${{ matrix.compiler }}
+          tags: add-netcdf:${{ matrix.compiler }}
+
+      - name: Build add-python:${{ matrix.compiler }}
+        uses: docker/build-push-action@v3
+        with:
+          file: Dockerfile-add-python
+          build-args: COMPILER=${{ matrix.compiler }}
+          tags: add-python:${{ matrix.compiler }}
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name:  images build and push
-        run: |
-          docker build . -t minimal-compiler:${{ matrix.compiler }} -f Dockerfile-${{ matrix.compiler }}-minimal
-          docker build . -t add-netcdf:${{ matrix.compiler }}       -f Dockerfile-add-netcdf --build-arg COMPILER=${{ matrix.compiler }}
-          docker build . -t add-python:${{ matrix.compiler }}       -f Dockerfile-add-python --build-arg COMPILER=${{ matrix.compiler }}
-          docker build . -t rte-rrtmgp-ci:${{ matrix.compiler }}    -f Dockerfile-finalize   --build-arg COMPILER=${{ matrix.compiler }}
-          docker tag rte-rrtmgp-ci:${{ matrix.compiler }} earthsystemradiation/rte-rrtmgp-ci:${{ matrix.compiler }}
-          docker push earthsystemradiation/rte-rrtmgp-ci:${{ matrix.compiler }}
-#          docker push ghcr.io/earth-system-radiation/rte-rrtmgp-ci:${{ matrix.compiler }}
+      - name: Log in to the Container registry
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-
-      # because we don't use the default `Dockerfile` and instead
-      # pass `-f Dockerfile-*`, the build step with `build-push-action`
-      # was not working (have not tried metadata)
-      # - name: Extract metadata (tags, labels) for Docker
-      #   id: meta
-      #   uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
-      #   with:
-      #     images: |
-      #       earthsystemradiation/rte-rrtmgp-ci
-      #       ghcr.io/${{ github.repository }}
-      #
-      # - name: Build and push Docker images
-      #   uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
-      #   with:
-      #     context: .
-      #     push: true
-      #     tags: ${{ steps.meta.outputs.tags }}
-      #     labels: ${{ steps.meta.outputs.labels }}
+      - name: Build and push rte-rrtmgp-ci:${{ matrix.compiler }}
+        uses: docker/build-push-action@v3
+        with:
+          file: Dockerfile-finalize
+          build-args: COMPILER=${{ matrix.compiler }}
+          push: ${{ github.ref == 'refs/heads/main' }}
+          tags: |
+            earthsystemradiation/rte-rrtmgp-ci:${{ matrix.compiler }}
+            ghcr.io/earth-system-radiation/rte-rrtmgp-ci:${{ matrix.compiler }}
