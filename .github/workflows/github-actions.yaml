@@ -13,20 +13,20 @@ jobs:
       - uses: actions/checkout@v3
 
       - name: Build minimal-compiler:${{ matrix.compiler }}
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           file: Dockerfile-${{ matrix.compiler }}-minimal
           tags: minimal-compiler:${{ matrix.compiler }}
 
       - name: Build add-netcdf:${{ matrix.compiler }}
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           file: Dockerfile-add-netcdf
           build-args: COMPILER=${{ matrix.compiler }}
           tags: add-netcdf:${{ matrix.compiler }}
 
       - name: Build add-python:${{ matrix.compiler }}
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           file: Dockerfile-add-python
           build-args: COMPILER=${{ matrix.compiler }}
@@ -48,7 +48,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push rte-rrtmgp-ci:${{ matrix.compiler }}
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           file: Dockerfile-finalize
           build-args: COMPILER=${{ matrix.compiler }}
