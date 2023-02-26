@@ -2,7 +2,7 @@
 # Most current mix of compiler and single CUDA version available from
 #   https://ngc.nvidia.com/catalog/containers/nvidia:nvhpc/tags
 #
-FROM nvcr.io/nvidia/nvhpc:22.11-devel-cuda11.8-ubuntu22.04
+FROM nvcr.io/nvidia/nvhpc:23.1-devel-cuda12.0-ubuntu22.04
 
 # Set default compiler executables
 ENV FC=nvfortran CC=nvc
