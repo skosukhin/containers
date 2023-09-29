@@ -19,11 +19,12 @@ ARG COMPILER
 ARG NFVERSION=4.5.4
 RUN curl https://downloads.unidata.ucar.edu/netcdf-fortran/$NFVERSION/netcdf-fortran-$NFVERSION.tar.gz | tar xz \
   && cd netcdf-fortran-$NFVERSION \
-  && ./configure \
-       CC=$CC CFLAGS='-O2' \
-       FC=$COMPILER FCFLAGS='-O2 -fPIC' \
-       --prefix=/opt/netcdf-fortran \
-       --disable-static \
+  && { ./configure \
+         CC=$CC CFLAGS='-O2' \
+         FC=$COMPILER FCFLAGS='-O2 -fPIC' \
+         --prefix=/opt/netcdf-fortran \
+         --disable-static || \
+       { cat ./config.log; exit 1; } } \
   && make -j \
   && make install \
   && cd .. \
