@@ -7,25 +7,22 @@ FROM minimal-compiler:$COMPILER
 
 # Install the dependencies
 RUN apt-get update \
- && apt-get --yes install \
-      --no-install-recommends \
-      libnetcdf-dev
+ && DEBIAN_FRONTEND=noninteractive apt-get --yes install --no-install-recommends \
+      curl \
+      libnetcdf-dev \
+ && rm -rf /var/lib/apt/lists/*
 
 # Install NetCDF Fortran
-#   Reuse the argument
-ARG COMPILER
 #   The version must be compitible with NetCDF C installed above
 ARG NFVERSION=4.5.4
-RUN apt-get --yes install \
-      --no-install-recommends \
-      curl \
-  && curl https://downloads.unidata.ucar.edu/netcdf-fortran/$NFVERSION/netcdf-fortran-$NFVERSION.tar.gz | tar xz \
+RUN curl https://downloads.unidata.ucar.edu/netcdf-fortran/$NFVERSION/netcdf-fortran-$NFVERSION.tar.gz | tar xz \
   && cd netcdf-fortran-$NFVERSION \
-  && ./configure \
-       CC=$CC CFLAGS='-O2' \
-       FC=$COMPILER FCFLAGS='-O2 -fPIC' \
-       --prefix=/opt/netcdf-fortran \
-       --disable-static \
+  && { ./configure \
+         CFLAGS='-O2' \
+         FCFLAGS='-O2 -fPIC' \
+         --prefix=/opt/netcdf-fortran \
+         --disable-static || \
+       { cat ./config.log; exit 1; } } \
   && make -j \
   && make install \
   && cd .. \

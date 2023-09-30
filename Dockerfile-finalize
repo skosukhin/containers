@@ -7,6 +7,6 @@ FROM add-python:$COMPILER
 
 # Install additional tools
 RUN apt-get update \
- && apt-get --yes install \
-      --no-install-recommends \
-      zstd
+ && DEBIAN_FRONTEND=noninteractive apt-get --yes install --no-install-recommends \
+      zstd \
+ && rm -rf /var/lib/apt/lists/*
