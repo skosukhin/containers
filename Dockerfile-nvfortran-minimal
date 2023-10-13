@@ -16,7 +16,10 @@ RUN apt-get update \
  && apt-get update \
  && DEBIAN_FRONTEND=noninteractive apt-get --yes install --no-install-recommends \
       nvhpc-${NVHPC_VERSION_MAJOR}-${NVHPC_VERSION_MINOR} \
- && rm -rf /var/lib/apt/lists/*
+ && rm -rf /var/lib/apt/lists/* \
+ && for dir in comm_libs examples math_libs profilers; do \
+      rm -rf "/opt/nvidia/hpc_sdk/Linux_x86_64/${NVHPC_VERSION_MAJOR}.${NVHPC_VERSION_MINOR}/${dir}"; \
+    done
 
 ENV PATH="/opt/nvidia/hpc_sdk/Linux_x86_64/${NVHPC_VERSION_MAJOR}.${NVHPC_VERSION_MINOR}/compilers/bin:${PATH}"
 
