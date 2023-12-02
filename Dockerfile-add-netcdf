@@ -20,12 +20,10 @@ RUN curl https://downloads.unidata.ucar.edu/netcdf-fortran/$NFVERSION/netcdf-for
   && { ./configure \
          CFLAGS='-O2' \
          FCFLAGS='-O2 -fPIC' \
-         --prefix=/opt/netcdf-fortran \
          --disable-static || \
        { cat ./config.log; exit 1; } } \
   && make -j \
   && make install \
   && cd .. \
   && rm -rf netcdf-fortran-$NFVERSION \
-  && echo '/opt/netcdf-fortran/lib' > /etc/ld.so.conf.d/libnetcdff.conf \
   && ldconfig
