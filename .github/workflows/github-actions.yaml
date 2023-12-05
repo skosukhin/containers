@@ -7,30 +7,30 @@ jobs:
   docker:
     strategy:
       matrix:
-        compiler:  [ifx, nvfortran]
+        toolchain:  [oneapi, nvhpc]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build minimal-compiler:${{ matrix.compiler }}
+      - name: Build minimal-toolchain:${{ matrix.toolchain }}
         uses: docker/build-push-action@v5
         with:
-          file: Dockerfile-${{ matrix.compiler }}-minimal
-          tags: minimal-compiler:${{ matrix.compiler }}
+          file: Dockerfile-${{ matrix.toolchain }}-minimal
+          tags: minimal-toolchain:${{ matrix.toolchain }}
 
-      - name: Build add-netcdf:${{ matrix.compiler }}
+      - name: Build add-netcdf:${{ matrix.toolchain }}
         uses: docker/build-push-action@v5
         with:
           file: Dockerfile-add-netcdf
-          build-args: COMPILER=${{ matrix.compiler }}
-          tags: add-netcdf:${{ matrix.compiler }}
+          build-args: TOOLCHAIN=${{ matrix.toolchain }}
+          tags: add-netcdf:${{ matrix.toolchain }}
 
-      - name: Build add-python:${{ matrix.compiler }}
+      - name: Build add-python:${{ matrix.toolchain }}
         uses: docker/build-push-action@v5
         with:
           file: Dockerfile-add-python
-          build-args: COMPILER=${{ matrix.compiler }}
-          tags: add-python:${{ matrix.compiler }}
+          build-args: TOOLCHAIN=${{ matrix.toolchain }}
+          tags: add-python:${{ matrix.toolchain }}
 
       - name: Log in to Docker Hub
         if: ${{ github.ref == 'refs/heads/main' }}
@@ -47,12 +47,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push rte-rrtmgp-ci:${{ matrix.compiler }}
+      - name: Build and push rte-rrtmgp-ci:${{ matrix.toolchain }}
         uses: docker/build-push-action@v5
         with:
           file: Dockerfile-finalize
-          build-args: COMPILER=${{ matrix.compiler }}
+          build-args: TOOLCHAIN=${{ matrix.toolchain }}
           push: ${{ github.ref == 'refs/heads/main' }}
           tags: |
-            earthsystemradiation/rte-rrtmgp-ci:${{ matrix.compiler }}
-            ghcr.io/earth-system-radiation/rte-rrtmgp-ci:${{ matrix.compiler }}
+            earthsystemradiation/rte-rrtmgp-ci:${{ matrix.toolchain }}
+            ghcr.io/earth-system-radiation/rte-rrtmgp-ci:${{ matrix.toolchain }}

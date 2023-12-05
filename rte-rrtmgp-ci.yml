@@ -7,70 +7,70 @@ version: '3.8'
 # so one either has to build the images at the beginning of the
 # chain or build them first
 services:
-  min-ifort:
+  min-oneapi:
     build:
       context: ./
-      dockerfile: Dockerfile-ifort-minimal
-    image: minimal-compiler:ifort
-    container_name: min-ifort
+      dockerfile: Dockerfile-oneapi-minimal
+    image: minimal-toolchain:oneapi
+    container_name: min-oneapi
 
-  min-nvfortran:
+  min-nvhpc:
     build:
       context: ./
-      dockerfile: Dockerfile-nvfortran-minimal
-    image: minimal-compiler:nvfortran
-    container_name: min-nvfortran
+      dockerfile: Dockerfile-nvhpc-minimal
+    image: minimal-toolchain:nvhpc
+    container_name: min-nvhpc
 
-  nc-ifort:
+  nc-oneapi:
     build:
       context: ./
       dockerfile: Dockerfile-add-netcdf
       args:
-        - COMPILER=ifort
-    image: add-netcdf:ifort
-    container_name: nc-ifort
+        - TOOLCHAIN=oneapi
+    image: add-netcdf:oneapi
+    container_name: nc-oneapi
 
-  nc-nvfortran:
+  nc-nvhpc:
     build:
       context: ./
       dockerfile: Dockerfile-add-netcdf
       args:
-        - COMPILER=nvfortran
-    image: add-netcdf:nvfortran
-    container_name: nc-nvfortran
+        - TOOLCHAIN=nvhpc
+    image: add-netcdf:nvhpc
+    container_name: nc-nvhpc
 
-  py-ifort:
+  py-oneapi:
     build:
       context: ./
       dockerfile: Dockerfile-add-python
       args:
-        - COMPILER=ifort
-    image: add-python:ifort
-    container_name: py-ifort
+        - TOOLCHAIN=oneapi
+    image: add-python:oneapi
+    container_name: py-oneapi
 
-  py-nvfortran:
+  py-nvhpc:
     build:
       context: ./
       dockerfile: Dockerfile-add-python
       args:
-        - COMPILER=nvfortran
-    image: add-python:nvfortran
-    container_name: py-nvfortran
+        - TOOLCHAIN=nvhpc
+    image: add-python:nvhpc
+    container_name: py-nvhpc
 
-  ci-ifort:
+  ci-oneapi:
     build:
       context: ./
       dockerfile: Dockerfile-finalize
       args:
-        - COMPILER=ifort
-    image: earthsystemradiation/rte-rrtmgp-ci:ifort
-    container_name: ci-ifort
+        - TOOLCHAIN=oneapi
+    image: earthsystemradiation/rte-rrtmgp-ci:oneapi
+    container_name: ci-oneapi
 
-  ci-nvfortran:
+  ci-nvhpc:
     build:
       context: ./
       dockerfile: Dockerfile-finalize
       args:
-        - COMPILER=nvfortran
-    image: earthsystemradiation/rte-rrtmgp-ci:nvfortran
-    container_name: ci-nvfortran
+        - TOOLCHAIN=nvhpc
+    image: earthsystemradiation/rte-rrtmgp-ci:nvhpc
+    container_name: ci-nvhpc
