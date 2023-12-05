@@ -1,6 +1,6 @@
 FROM ubuntu:22.04
 
-ARG ONEAPI_VERSION='2024.0'
+ARG ONEAPI_VERSION='2023.2.2'
 
 # Extend and update the package registry
 RUN apt-get update \
