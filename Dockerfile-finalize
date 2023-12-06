@@ -2,8 +2,8 @@
 # Finalize CI containers
 #
 
-ARG COMPILER
-FROM add-python:$COMPILER
+ARG TOOLCHAIN
+FROM add-python:$TOOLCHAIN
 
 # Install additional tools
 RUN apt-get update \

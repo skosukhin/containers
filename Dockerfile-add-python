@@ -2,8 +2,8 @@
 # Install Python3 and a small set of packages
 #
 
-ARG COMPILER
-FROM add-netcdf:$COMPILER
+ARG TOOLCHAIN
+FROM add-netcdf:$TOOLCHAIN
 
 # Install Python
 RUN apt-get update \
