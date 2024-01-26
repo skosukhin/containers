@@ -7,7 +7,7 @@ jobs:
   docker:
     strategy:
       matrix:
-        toolchain:  [oneapi, nvhpc]
+        toolchain:  [nvhpc]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -33,26 +33,16 @@ jobs:
           tags: add-python:${{ matrix.toolchain }}
 
       - name: Log in to Docker Hub
-        if: ${{ github.ref == 'refs/heads/main' }}
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-
-      - name: Log in to the Container registry
-        if: ${{ github.ref == 'refs/heads/main' }}
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push rte-rrtmgp-ci:${{ matrix.toolchain }}
         uses: docker/build-push-action@v5
         with:
           file: Dockerfile-finalize
           build-args: TOOLCHAIN=${{ matrix.toolchain }}
-          push: ${{ github.ref == 'refs/heads/main' }}
+          push: true
           tags: |
-            earthsystemradiation/rte-rrtmgp-ci:${{ matrix.toolchain }}
-            ghcr.io/earth-system-radiation/rte-rrtmgp-ci:${{ matrix.toolchain }}
+            skosukhin/rte-rrtmgp-ci:${{ matrix.toolchain }}
