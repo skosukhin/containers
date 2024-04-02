@@ -1,7 +1,7 @@
 FROM ubuntu:22.04
 
 ARG NVHPC_VERSION_MAJOR='24'
-ARG NVHPC_VERSION_MINOR='1'
+ARG NVHPC_VERSION_MINOR='3'
 
 # Extend and update the package registry
 RUN apt-get update \
